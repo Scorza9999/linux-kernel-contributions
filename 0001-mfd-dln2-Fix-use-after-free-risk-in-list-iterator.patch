@@ -1,0 +1,54 @@
+From c06de00faf91189b273318eb516e87527433d087 Mon Sep 17 00:00:00 2001
+From: Riccardo Oliva <oliva.scorza@gmail.com>
+Date: Mon, 12 Oct 2026 18:32:20 -0500
+Subject: [PATCH] mfd: dln2: Fix use-after-free risk in list iterator
+
+In dln2_unregister_event_cb(), the iterator variable 'i' is used after
+the list_for_each_entry() loop terminates to free memory.
+
+Fix this by introducing a dedicated 'target' pointer to hold the entry,
+isolating the iterator to the loop scope and removing the 'found' bool.
+
+Assisted-by: coccinelle sparse
+Signed-off-by: Riccardo Oliva <oliva.scorza@gmail.com>
+---
+ drivers/mfd/dln2.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/mfd/dln2.c b/drivers/mfd/dln2.c
+index 0b1e7fd7f..7cd64aad1 100644
+--- a/drivers/mfd/dln2.c
++++ b/drivers/mfd/dln2.c
+@@ -157,25 +157,24 @@ EXPORT_SYMBOL(dln2_register_event_cb);
+ void dln2_unregister_event_cb(struct platform_device *pdev, u16 id)
+ {
+ 	struct dln2_dev *dln2 = dev_get_drvdata(pdev->dev.parent);
+-	struct dln2_event_cb_entry *i;
++	struct dln2_event_cb_entry *i, *target = NULL;
+ 	unsigned long flags;
+-	bool found = false;
+ 
+ 	spin_lock_irqsave(&dln2->event_cb_lock, flags);
+ 
+ 	list_for_each_entry(i, &dln2->event_cb_list, list) {
+ 		if (i->id == id) {
+ 			list_del_rcu(&i->list);
+-			found = true;
++			target = i;
+ 			break;
+ 		}
+ 	}
+ 
+ 	spin_unlock_irqrestore(&dln2->event_cb_lock, flags);
+ 
+-	if (found) {
++	if (target) {
+ 		synchronize_rcu();
+-		kfree(i);
++		kfree(target);
+ 	}
+ }
+ EXPORT_SYMBOL(dln2_unregister_event_cb);
+-- 
+2.43.0
+
