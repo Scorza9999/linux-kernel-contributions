@@ -13,7 +13,7 @@ A collection of kernel patches submitted by me for the Linux kernel mainline dri
 ---
 
 ### 2. `drivers/staging/vme.c` — avoid iterator variable access outside list loop
-* **Status:** Independently Discovered & Drafted 
+* **Status:** Currently in [staging-next](https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging.git/commit/?h=staging-next&id=ac086c03d031832ea3f1cf6c306812b50355c770)
 * **Detection Tool:** Coccinelle (`scripts/coccinelle/iterators/use_after_iter.cocci`)
 * **Category:** Iterator Scope
 * **Summary:** Independently identified and drafted a [fix](https://lore.kernel.org/linux-staging/20261012034020.100737-1-oliva.scorza@gmail.com/). Audit confirmed it was discovered a [week prior](https://lore.kernel.org/linux-staging/20261005042911.64922-1-marinela.selseth@firmwaredesign.org/), validating the analysis methodology and finding.
