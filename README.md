@@ -4,11 +4,11 @@ A collection of kernel patches submitted by me for the Linux kernel mainline dri
 
 ---
 
-### 1. `drivers/mfd/dln2.c` — List Iterator Memory Safety Fix
-* **Status:** Under Review ([Lore Thread](https://lore.kernel.org/mfd/20261012234230.17966-1-oliva.scorza@gmail.com/))
+### 1. `drivers/mfd/dln2.c` — Clean up dln2_unregister_event_cb() loop logic
+* **Status:** Applied ([Lore Thread](https://lore.kernel.org/mfd/179381522079.1916138.4679305340156782083.b4-ty@b4/T/#u))
 * **Detection Tool:** Coccinelle (`scripts/coccinelle/iterators/use_after_iter.cocci`)
-* **Category:** Use-After-Free Prevention
-* **Summary:** Refactored `dln2_unregister_event_cb()` to eliminate post-loop usage of the list iterator variable `i`. Introduced a `target` pointer to capture the entry inside the lock scope prior to freeing, preventing potential use-after-free conditions and removing redundant state booleans.
+* **Category:** Iterator Scope
+* **Summary:** Refactored `dln2_unregister_event_cb()` to eliminate post-loop usage of the list iterator variable `i`. Introduced an `entry` pointer to capture the entry inside the lock scope prior to freeing, preventing potential use-after-free conditions and removing redundant state booleans.
 
 ---
 
